@@ -66,6 +66,36 @@ def print_part(line, s, e, data):
     if line < len(data) - 1:
         print(data[line + 1][s:e])
 
+def is_str_num(ch):
+    return ch in '0123456789'
+
+
+def get_num(line, x):
+    s = e = x
+    while s > 0 and is_str_num(line[s-1]):
+        s -= 1
+    while e < len(line) and is_str_num(line[e]):
+        e += 1
+    return int(line[s:e])
+
+def get_gear(data, x, y):
+    nums = []
+    tl = data[y-1]
+    ll = data[y]
+    bl = data[y+1]
+    for line in [tl, ll, bl]:
+        if is_str_num(line[x-1]) and not is_str_num(line[x]) and is_str_num(line[x+1]):
+            nums.append(get_num(line, x-1))
+            nums.append(get_num(line, x+1))
+        elif is_str_num(line[x-1]):
+            nums.append(get_num(line, x-1))
+        elif is_str_num(line[x]):
+            nums.append(get_num(line, x))
+        elif is_str_num(line[x+1]):
+            nums.append(get_num(line, x+1))
+    if len(nums) == 2:
+        return nums[0] * nums[1]
+    return 0
 
 def main():
     test = False
@@ -74,26 +104,11 @@ def main():
     data = read_input(test=test)
     w = len(data[0])
     h = len(data)
-    current_line = 0
-    s = e = 0
-    num_locations = []
-    while current_line < h:
-        s, e = find_next_number(data[current_line], e)
-        if s is None:
-            current_line += 1
-            continue
-        if data[current_line][e - 1] == "-":
-            continue
-        num_locations.append((current_line, s, e))
     sum = 0
-    for line, s, e in num_locations:
-        part = False
-        if is_part(data, line, s, e):
-            part = True
-            num = data[line][s:e]
-            sum += int(num)
-        print("!!!", data[line][s:e], part)
-        print_part(line, s, e, data)
+    for y in range(h):
+        for x in range(w):
+            if data[y][x] == "*":
+                sum += get_gear(data, x, y)
     print(sum)
 
 
